@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -288,6 +289,7 @@ func (tf *tokenRefresher) Token() (*Token, error) {
 			values.Set("scope", strings.Join(tf.t.Scopes, " "))
 		}
 	}
+	fmt.Println(values)
 	tk, err := retrieveToken(tf.ctx, tf.conf, values)
 
 	if err != nil {
