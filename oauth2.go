@@ -253,6 +253,7 @@ func (c *Config) TokenSource(ctx context.Context, t *Token) TokenSource {
 	}
 	if t != nil {
 		tkr.refreshToken = t.RefreshToken
+		tkr.t = t
 	}
 	return &reuseTokenSource{
 		t:   t,
@@ -266,6 +267,7 @@ type tokenRefresher struct {
 	ctx          context.Context // used to get HTTP requests
 	conf         *Config
 	refreshToken string
+	t            *Token
 }
 
 // WARNING: Token is not safe for concurrent access, as it
@@ -277,10 +279,16 @@ func (tf *tokenRefresher) Token() (*Token, error) {
 		return nil, errors.New("oauth2: token expired and refresh token is not set")
 	}
 
-	tk, err := retrieveToken(tf.ctx, tf.conf, url.Values{
+	values := url.Values{
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {tf.refreshToken},
-	})
+	}
+	if tf.t != nil {
+		if len(tf.t.Scopes) != 0 {
+			values.Set("scope", strings.Join(tf.t.Scopes, " "))
+		}
+	}
+	tk, err := retrieveToken(tf.ctx, tf.conf, values)
 
 	if err != nil {
 		return nil, err

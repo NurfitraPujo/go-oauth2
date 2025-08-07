@@ -56,6 +56,10 @@ type Token struct {
 	// `Expiry` from `ExpiresIn` when required.
 	ExpiresIn int64 `json:"expires_in,omitempty"`
 
+	// Scopes is the OAuth2 wire format "scopes" field which specified
+	// what resources the token is authorized to access.
+	Scopes []string `json:"scopes,omitempty"`
+
 	// raw optionally contains extra metadata from the server
 	// when updating a token.
 	raw any
